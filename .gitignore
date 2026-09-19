@@ -1,0 +1,25 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Raw external repository
+data/raw/
+
+# Generated processed corpus
+data/processed/
+
+# Generated statistics
+data/stats/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Python
+*.pyc
