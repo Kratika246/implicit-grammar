@@ -2,9 +2,8 @@ from pathlib import Path
 import random
 import ast
 import json
+import subprocess
 
-
-RAW_DIR = Path("data/raw")
 TRAIN_DIR = Path("data/processed/train")
 EVAL_DIR = Path("data/processed/generation_eval")
 STATS_DIR = Path("data/stats")
@@ -12,6 +11,26 @@ STATS_DIR = Path("data/stats")
 TRAIN_RATIO = 0.8
 SEED = 42
 
+RAW_DIR = Path("data/raw")
+RAW_REPO = RAW_DIR / "thealgorithms-python"
+RAW_REPO_URL = "https://github.com/TheAlgorithms/Python.git"
+
+def ensure_raw_dataset():
+
+    if RAW_REPO.exists() and any(RAW_REPO.rglob("*.py")):
+        print("Raw dataset already exists.")
+        return
+
+    RAW_DIR.mkdir(parents=True, exist_ok=True)
+
+    print("Downloading TheAlgorithms/Python...")
+
+    subprocess.run(
+        ["git", "clone", RAW_REPO_URL, str(RAW_REPO)],
+        check=True
+    )
+
+    print("Raw dataset downloaded.")
 
 def should_skip(path: Path):
 
@@ -39,12 +58,12 @@ def clean_code(code: str, strip_non_ascii=False):
 
 def get_python_files():
     """
-    Find all .py files inside data/raw.
+    Find all .py files inside the TheAlgorithms/Python repository.
     """
 
     files = []
 
-    for path in RAW_DIR.rglob("*.py"):
+    for path in RAW_REPO.rglob("*.py"):
 
         if should_skip(path):
             continue
@@ -52,7 +71,6 @@ def get_python_files():
         files.append(path)
 
     return files
-
 
 def extract_functions(code: str):
     """
@@ -84,6 +102,8 @@ def extract_functions(code: str):
 def main():
 
     random.seed(SEED)
+
+    ensure_raw_dataset()
 
     TRAIN_DIR.mkdir(parents=True, exist_ok=True)
     EVAL_DIR.mkdir(parents=True, exist_ok=True)
